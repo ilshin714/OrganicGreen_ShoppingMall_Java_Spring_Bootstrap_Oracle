@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Mapper 3.0//en"
+      "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="purchase">
+	<!-- 로그인 아이디와 상품명을 통해 주문한 상품 정보 조회 -->
+   <select id="purchaseData" parameterType="bean.BproductVo" resultType="bean.BproductVo">
+     select *
+     from bProduct
+     where bpId=#{sbId} and bpName=#{mSubject}
+  </select>
+  <!-- 로그인한 아이디를 통해 구매자의 정보 조회 -->
+  <select id="purchaseBmemberdata" parameterType="bean.BmemberVo" resultType="bean.BmemberVo">
+     select *
+     from bMember
+     where bId=#{sbId}
+  </select>
+  <!-- 로그인한 아이디를 통해 구매자의 이름,적립금,비밀번호,판매자/구매자 조회 -->
+  <select id="purchaseSbMemberdata" parameterType="bean.SbMemberVo" resultType="bean.SbMemberVo">
+     select *
+     from SbMember
+     where sbId=#{sbId}
+  </select>
+  
+
+	
+  
+</mapper>

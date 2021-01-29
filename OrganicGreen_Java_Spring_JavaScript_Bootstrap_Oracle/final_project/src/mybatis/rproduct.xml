@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Mapper 3.0//en"
+      "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mulgun">
+
+	<select id='findStr' parameterType='String'
+		resultType="bean.MproductVo">
+		select *
+		from mProduct where mSubject like '%${findStr}%'
+	</select>
+
+	<select id="totListSize" parameterType="bean.BproductParam"
+		resultType="Integer">
+		select count(*) cnt from fpreview
+	</select>
+
+	<select id='view' parameterType='bean.MproductVo'
+		resultType='bean.MproductVo'>
+		select *
+		from mproduct where mSubject = #{rSubject }
+	</select>
+
+	<select id='option' parameterType='bean.RproductVo'
+		resultType='bean.RproductVo'>
+		select rpName, rPrice, rContent, rVideo
+		from rproduct where rSubject = #{rSubject }
+	</select>
+
+	<select id='review' parameterType='Integer'
+		resultType='bean.FpReviewVo'>
+		select * from (
+		select rownum rno, A.* from
+		(select *
+		from fpreview
+		order by rvdate desc) A
+		)where rno between
+		${startNo} and ${endNo}
+ 	</select>
+
+	<select id='purchaseMember' parameterType='bean.RproductVo'
+		resultType='bean.BmemberVo'>
+		select * from bmember where bId = #{sId}
+	</select>
+
+	<select id='purchaseMember2' parameterType='bean.RproductVo'
+		resultType='bean.SbMemberVo'>
+		select * from sbmember where sbId = #{sId}
+	</select>
+ 	
+	<!-- 솔빈형 주석 -->
+ 	<insert id="insertBproduct1" parameterType="bean.CproductVo">
+			insert into bproduct (bcode, bpName, bpprice, bpdate, bpid, bprate, bpea, bpaddress, bdprice, bptotal, bpphoto, bsid, bpoint, bpserial, bprequest) 
+			values(bproduct_seq_temp2, #{cOption1}, #{cPrice1}, sysdate, #{cId}, 0, #{cEa1}, #{cAddress}, 0, #{cpSum1}, #{cPhoto}, #{cpId}, #{cPoint1}, 1, #{cpRequest})
+ 	</insert>
+	<insert id="insertBproduct2" parameterType="bean.CproductVo">
+			into bproduct (bcode, bpName, bpprice, bpdate, bpid, bprate, bpea, bpaddress, bdprice, bptotal, bpphoto, bsid, bpoint, bpserial, bprequest)
+			values(bproduct_seq_temp2, #{cOption2}, #{cPrice2}, sysdate, #{cId}, 0, #{cEa2}, #{cAddress}, 0, #{cpSum2}, #{cPhoto}, #{cpId}, #{cPoint2}, 1, #{cpRequest})
+ 	</insert>
+ 	<insert id="insertBproduct3" parameterType="bean.CproductVo">
+			into bproduct (bcode, bpName, bpprice, bpdate, bpid, bprate, bpea, bpaddress, bdprice, bptotal, bpphoto, bsid, bpoint, bpserial, bprequest)
+			values(bproduct_seq_temp2, #{cOption3}, #{cPrice3}, sysdate, #{cId}, 0, #{cEa3}, #{cAddress}, 0, #{cpSum3}, #{cPhoto}, #{cpId}, #{cPoint3}, 1, #{cpRequest})
+ 	</insert>
+	<update id="updateRproduct1" parameterType="bean.CproductVo">
+		update rproduct set rEa = rEa - #{cEa1} where rsId = #{cpId} and rpName = #{cOption1} 
+	</update>
+	<update id="updateRproduct2" parameterType="bean.CproductVo">
+		update rproduct set rEa = rEa - #{cEa2} where rsId = #{cpId} and rpName = #{cOption2} 
+	</update>
+	<update id="updateRproduct3" parameterType="bean.CproductVo">
+		update rproduct set rEa = rEa - #{cEa3} where rsId = #{cpId} and rpName = #{cOption3}
+	</update>
+</mapper>

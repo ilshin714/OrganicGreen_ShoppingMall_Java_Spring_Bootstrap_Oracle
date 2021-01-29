@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "=//mybatis.org/DTD Mapper 3.0 //en"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="service">
+
+	<!-- 공지사항 상세보기 -->
+	<select id='noticeView' parameterType="Integer"
+		resultType="bean.NoticeVo">
+		select mnSubject, to_char(mnDate, 'rrrr-mm-dd') mnDate,
+		mnView, mnContent
+		from mNotice where mnSerial = ${mnSerial}
+	</select>
+
+	<!-- 공지사항 리스트 뽑기 -->
+	<select id='searchNotice' parameterType="bean.ServiceParam"
+		resultType="bean.NoticeVo">
+		select * from(select rownum rno, A.* from (select * from
+		mNotice
+		<choose>
+			<when test="searchOption.equals(2)">where dNumber like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where dpName like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+		) A ) where rno between ${startNo} and
+		${endNo}
+	</select>
+
+	<!-- 공지사항 리스트 뽑기 - 페이지 처리 -->
+	<select id='totPageNotice' parameterType="bean.ServiceParam"
+		resultType="Integer">
+		select count(*) cnt from mNotice
+		<choose>
+			<when test="searchOption.equals(2)">where dNumber like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where dpName like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
+	<!-- 1대1문의 등록 -->
+	<insert id="questionSend" parameterType="bean.QuestionVo">
+		insert into
+		question(qSerial, qbId, qSubject, qContent, qanswer, qDate)
+		values(seq_question.nextval, #{bId}, #{qSubject}, #{qContent}, 1,
+		sysdate)
+	</insert>
+
+	<!--구매자 1:1문의 상세보기 -->
+	<select id="question_view" parameterType="Integer"
+		resultType="bean.QuestionVo">
+		select qSerial, qbId, qSubject, qContent, qAnswer,
+		qrSubject, qrContent, to_char(qDate, 'rrrr-MM-dd') qDate,
+		to_char(qrDate, 'rrrr-MM-dd') qrDate from question where qSerial =
+		${qSerial}
+	</select>
+
+</mapper>
+

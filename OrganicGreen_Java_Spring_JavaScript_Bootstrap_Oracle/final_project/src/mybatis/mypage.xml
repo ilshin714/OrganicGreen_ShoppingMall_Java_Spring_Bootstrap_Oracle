@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mypage">
+	<select id="totPage" parameterType="bean.BproductParam" resultType="int">
+		select count(*) cnt from Bproduct
+		where bpId = #{bpId} 
+	</select>
+	
+	<select id="mypageOrder" parameterType="bean.CproductVo" resultType="bean.BproductVo">
+		select * from bproduct 
+		where bpId= #{cId}
+		order by bpDate desc
+	</select>
+	
+	<select id="mypageCart" parameterType="bean.CproductVo" resultType="bean.CproductVo">
+		select * from cproduct where cId = #{cId}
+	</select>
+	
+	<delete id="deleteCart" parameterType="bean.CproductVo">
+		delete from cproduct where cId = #{cId} and cpName = #{cpName}
+	</delete>
+	
+	<select id="mypageQuestion" parameterType="bean.QuestionVo" resultType="bean.QuestionVo">
+		select * from question where qbId = #{qbId}
+	</select>
+	
+	<insert id="insertCart" parameterType="bean.CproductVo" >
+      INSERT ALL
+      <if test="cOption1 != '' and cOption1 != null">
+         INTO cproduct (cpName, cPrice, cId, cEa, cPhoto) VALUES(#{cOption1}, #{cPrice1}, #{cId}, #{cEa1}, #{cPhoto})
+      </if>
+      <if test="cOption2 != '' and cOption2 != null">
+         INTO cproduct (cpName, cPrice, cId, cEa, cPhoto) VALUES(#{cOption2}, #{cPrice2}, #{cId}, #{cEa2}, #{cPhoto})
+      </if>
+      <if test="cOption3 != '' and cOption3 != null">
+         INTO cproduct (cpName, cPrice, cId, cEa, cPhoto) VALUES(#{cOption3}, #{cPrice3}, #{cId}, #{cEa3}, #{cPhoto})
+      </if>
+      SELECT * FROM DUAL
+   </insert>
+	
+</mapper>

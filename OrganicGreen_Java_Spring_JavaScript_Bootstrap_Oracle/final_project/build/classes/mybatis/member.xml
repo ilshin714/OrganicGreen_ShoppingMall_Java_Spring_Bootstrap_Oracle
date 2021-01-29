@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Mapper 3.0//en"
+      "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+
+	<insert id="bRegister" parameterType="bean.SbMemberVo">
+		insert into bMember values
+		(#{sbId},#{bEmail},#{bPhone},#{bAddress},TO_CHAR(SYSDATE,
+		'YYYYMMDD'),1000,0,#{bBdate},#{bPostal},#{bAddress2})
+	</insert>
+
+	<insert id="sbRegister" parameterType="bean.SbMemberVo">
+		insert into sbMember values (#{sbId},#{sbPwd},#{sbName},1,1000)
+	</insert>
+
+	<select id="login" parameterType="bean.SbMemberVo"
+		resultType="bean.SbMemberVo">
+		select *
+		from sbMember
+		where sbId=#{sbId} and sbPwd=#{sbPwd}
+	</select>
+
+	<select id="idCheck" parameterType="String" resultType="Integer">
+		select
+		count(*) from bMember
+		where bId =#{bId}
+	</select>
+
+</mapper>

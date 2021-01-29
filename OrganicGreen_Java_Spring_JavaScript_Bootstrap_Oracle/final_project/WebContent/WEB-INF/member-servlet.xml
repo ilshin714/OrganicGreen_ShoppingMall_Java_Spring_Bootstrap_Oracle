@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id='memberDao' class='bean.MemberDao'></bean>
+
+	<bean id='memberController' class='servlet.MemberController'>
+		<constructor-arg ref='memberDao'></constructor-arg>
+	</bean>
+
+
+
+	<bean id='memberResolver'
+		class='org.springframework.web.servlet.view.InternalResourceViewResolver'>
+		<property name="prefix" value="/member/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

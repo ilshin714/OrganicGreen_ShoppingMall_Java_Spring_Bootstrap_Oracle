@@ -1,0 +1,147 @@
+@charset "UTF-8";
+.edge {
+	border: 1px solid #afbbb64f;
+	box-sizing: border-box;
+}
+.btn-lg {
+	width:158px;
+}
+.tc{
+	text-align:center;
+}
+.tlf{
+	text-align:left;
+}
+.trg{
+	text-align:right;
+}
+/*dropdown item*/
+.dm{
+	width:128.45px;
+}
+.mypage_font{
+	line-heignt:23px;
+}
+#mypage_list-tab{
+	font-weight:bold;
+}
+/*마이페이지 타이틀 공통 css */
+.mypage_tit{
+	font-size:16px;
+	font-weight:bold;
+}
+/*구매자, 적립금 구역*/
+#mypage_user_info{
+	height:50px;
+	line-height:45px;
+	margin-bottom:10px;
+}
+/*구매자, 적립금 내역 글씨크기*/
+#mypage_user_info_font{
+	font-weight:bold;
+	font-size:17px;
+}
+#mypage_order{
+	padding-top:2%;
+}
+#mypage_order_bpName{
+	padding:5px;
+}
+#mypage_bpPrice{
+	padding:5px;
+}
+
+#mypage_bpDate{
+	padding:5px;
+}
+
+#mypage_delivery{
+	padding:5px;
+	line-height:105px;
+}
+#mypage_orderBtn{
+	padding-top:13px;
+}
+#mypage_order_page{
+	margin-top:15px;
+	margin-left:310px;
+}
+/*마이페이지-장바구니탭-------------------------------*/
+/*장바구니- 선택삭제 버튼*/
+.cartDeleteBtn{
+	margin-left:-10px;
+	margin-bottom:8px;
+}
+
+#mypage_cart_tit{
+	height:45px;
+	line-height:42px;
+	font-weight:bold;
+}
+/*장바구니-checkbox*/
+.mypage_cart input[type=checkbox]{
+	width:15px;
+	height:15px;
+}
+/*장바구니 리스트*/
+#mypage_cart_list{
+	text-align:center;
+}
+
+/*장바구니 1개행 개별 삭제*/
+.btnDeleteEach>button{
+	width:30px;
+	height:15px;
+}
+.mypage_cart_lists{
+	line-height: 202px;
+}
+/*장바구니 - 합계*/
+.mypage_cart_sum{
+	padding: 10px 0;
+}
+
+/*마이페이지--------------------------------*/
+/*마이페이지-적립금내역 - 기간별 조회 */
+#mypage_point_dropYear{
+	font-weight:bold;
+	font-size:13px;
+	line-height:30px;
+}
+.mypage_point_total{
+	font-size:14px;
+	font-weight:bold;
+	margin-bottom:14px;
+}
+
+/*상품후기--------------------------*/
+/*상품후기 타이틀------------------------*/
+#mypage_reply_tit{
+	height:30px;
+	margin-top:14px;
+	line-height:30px;
+	font-weight:bold;
+}
+/*상품후기 갯수*/
+#mypage_reply_cnt{
+	line-height:30px;
+	font-weight:bold;
+}
+
+.mypage_reply_list{
+	padding-top:60px;
+}
+
+/*1:1문의---------------------------------*/
+.mypage_inquery{
+	font-size:20px;
+	font-weight:bold;
+	margin-bottom:10px;
+}
+.mypage_inquery_content{
+	line-height:4em;
+	font-size:14px;
+}
+
+
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+      		http://www.springframework.org/schema/beans
+      		http://www.springframework.org/schema/beans/spring-beans.xsd
+      ">
+
+
+
+	<bean id='rproDao' class='bean.RproductDao' />
+
+	<bean id='rproductController' class='servlet.RproductController' >
+		<constructor-arg ref='rproDao'/>
+	</bean>     
+	
+	<bean id='rproductResolver'
+			class = 'org.springframework.web.servlet.view.InternalResourceViewResolver'>
+		<property name="prefix" value="/manager/" />
+		<property name="suffix" value=".jsp"/>
+	</bean> 
+	
+	<bean id='managerDao' class='bean.ManagerDao' />
+
+   	<bean id='managerController' class='servlet.ManagerController'>
+      <constructor-arg ref='managerDao' />
+   	</bean>
+
+  	<bean id='managerResolver'
+      class='org.springframework.web.servlet.view.InternalResourceViewResolver'>
+      <property name='prefix' value='/manager/' />
+      <property name='suffix' value='.jsp' />
+   </bean>
+	
+	
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Mapper 3.0//en"
+      "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+	
+
+	<select id="alreadyEmail" parameterType="String" resultType="Integer">
+		select
+		count(*) from sbMember
+		where sbEmail =#{value}
+	</select>
+	
+	<select id="findPwd" parameterType="bean.SbMemberVo"
+		resultType="bean.SbMemberVo">
+		select sbPwd
+		from sbMember
+		where sbName=#{sbName} and
+		sbEmail=#{sbEmail} and sbId=#{sbId}
+	</select>
+
+
+	<select id="findId" parameterType="bean.SbMemberVo"
+		resultType="bean.SbMemberVo">
+		select sbId
+		from sbMember
+		where sbName=#{sbName} and
+		sbEmail=#{sbEmail}
+	</select>
+
+	<insert id="bRegister" parameterType="bean.SbMemberVo">
+		insert into bMember
+		(bId,bPhone,bAddress,bAddress2,bDate,btPoint,btPa,bbDate,bPostal)
+		values
+		(#{sbId},#{bPhone},#{bAddress},#{bAddress2},SYSDATE,1000,0,#{bBdate},#{bPostal})
+	</insert>
+
+	<insert id="sbRegister" parameterType="bean.SbMemberVo">
+		insert into sbMember
+		(sbId,sbPwd,sbName,sbEmail,sbGrade,sbPoint)
+		values
+		(#{sbId},#{sbPwd},#{sbName},#{sbEmail},1,1000)
+	</insert>
+
+	<select id="login" parameterType="bean.SbMemberVo"
+		resultType="bean.SbMemberVo">
+		select *
+		from sbMember
+		where sbId=#{sbId} and sbPwd=#{sbPwd}
+	</select>
+
+	<select id="idCheck" parameterType="String" resultType="Integer">
+		select
+		count(*) from bMember
+		where bId =#{bId}
+	</select>
+
+</mapper>

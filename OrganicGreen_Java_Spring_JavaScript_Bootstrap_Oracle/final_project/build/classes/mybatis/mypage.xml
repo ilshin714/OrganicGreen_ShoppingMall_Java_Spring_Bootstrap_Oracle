@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="mypage">
+	<select id="totPage" parameterType="bean.BproductParam" resultType="int">
+		select count(*) cnt from Bproduct
+		where bpId = #{bpId} <!-- 2019-09-23 로 들어 왔을 때 검색어로 09-23 을 찾으면 값이 나옴 --> 
+	</select>
+	
+	<select id="search" parameterType="bean.BproductParam" resultType="bean.BproductVo">
+		select * from bproduct where bpId= #{bpId}
+	</select>
+	
+	<select id="view" parameterType="bean.BproductVo" resultType="bean.BproductVo">
+		select * from bproduct
+		where bpId= #{bpId}
+	</select>
+
+	<select id="cart" parameterType="bean.BproductParam" resultType="bean.CproductVo">
+		select * from cproduct where cpName = #{cpName} 
+	</select>
+	
+	<delete id="deleteCart" parameterType="bean.BproductParam">
+		delete from cproduct where cOption = #{cOption} 
+	</delete>
+	
+<!-- 	<select id="insertCart" parameterType="CproductVo" resultType="bean.CproductVo"> -->
+<!-- 		insert into cproduct(cpName, cPrice, cId, cEa, cPhoto, cOption) -->
+<!-- 		values(${cpName}, ${cPrice}, ${cId}, ${cEa}, ${cPhoto}, ${cOption}) -->
+<!-- 	</select> -->
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org/DTD Mapper 3.0 //en"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="manager">
+
+	
+	<select id = "totListSize" parameterType="bean.Param" resultType="Integer">
+	  select count(*) cnt from rproduct
+      where   rSerial like '%${findStr}%'
+      or         rsName      like '%${findStr}%'
+      or         rpName       like '%${findStr}%'
+     
+	</select>
+	
+	<select id = "search" parameterType = "bean.Param" resultType = "bean.RproductVo">
+		select * from rproduct
+	</select>
+	
+	<insert id ="insert" parameterType="bean.RproductVo">
+		insert into rProduct(rSerial, rpName, rEa, rPrice, rsName, rRate, rPhoto)
+		values(1, #{rpName}, #{rEa}, #{rPrice}, #{rsName}, #{rRate}, #{rPhoto})
+	</insert>
+	
+		<!-- 관리자 - 배송현황 -->
+	<select id='searchDelivery' parameterType="bean.ManagerParam"
+		resultType="bean.DeliveryVo">
+		select * from(select rownum rno, A.* from (select * from
+		delivery
+		<choose>
+			<when test="!searchStatus.equals('')">where dstatus = #{searchStatus}</when>
+			<otherwise></otherwise>
+		</choose>
+		) A	) where rno between ${startNo} and
+		${endNo}
+	</select>
+
+	<!-- 관리자 - 배송현황 - 페이지 처리 -->
+	<select id='totPageDelivery' parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt
+		from
+		delivery
+		<choose>
+			<when test="!searchStatus.equals('')">where dstatus = #{searchStatus}</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
+		<!-- 배송 차트 -->
+	<!-- 배송전 건수 카드 작성용 -->
+	<select id='searchDeliveryChart1'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송준비'
+	</select>
+
+	<!-- 배송중 건수 카드 작성용 -->
+	<select id='searchDeliveryChart2'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송중'
+	</select>
+
+	<!-- 배송완료 건수 카드 작성용 -->
+	<select id='searchDeliveryChart3'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송완료'
+	</select>
+
+	<!-- 입급대기 건수 카드 작성용 -->
+	<select id='searchDeliveryChart4'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '입급대기'
+	</select>
+
+	<select id='searchSell' parameterType="bean.Param"
+		resultType="bean.SellerVo">
+		select * from(select rownum rno, A.* from (select * from
+		bproduct ) A
+		) where rno between ${startNo} and
+		${endNo}
+	</select>
+
+	<select id='totPageSell' resultType="Integer">
+		select count(*) cnt from bproduct
+	</select>
+
+<!-- 판매현황 카드 작성용 - 총판매액, 총판매량 -->
+	<select id='searchSellChartAll' resultType="bean.SellerVo">
+		select sum(bpprice) totPrice, sum(bpea) totEa from bproduct
+	</select>
+	
+	<select id ="chartMain" parameterType="Integer" resultType = "bean.BproductVo">
+		select sum(bpprice) monthTotal from bProduct where to_char(bpDate , 'yyyy-fmMM') like '2019-${i}'
+	
+	</select>
+	
+	<select id = "chartPie" resultType = "bean.BproductVo">
+		select sum(bpTotal) mainPieTotal, bpName from bProduct group by(bpName)
+	</select>
+	
+	<select id = "chartMonthTotal" resultType = "bean.BproductVo">
+	 	select sum(bpTotal) monthTotal from bProduct where to_char(bpDate, 'yyyy-MM') = to_char(sysdate , 'yyyy-MM')
+	</select>
+	
+	<select id = "chartYearTotal" resultType = "bean.BproductVo">
+		select sum(bpea) yearTotalEa, sum(bpTotal) yearTotal from bProduct where to_char(bpDate, 'yyyy') = to_char(sysdate, 'yyyy')
+	</select>
+	
+	<select id = "chartSale" resultType = "bean.BproductVo" >
+		select sum(b.bpea) totSaleEa, r.rEa, r.rSubject from bProduct b join rProduct r on b.bpName = r.rpName group by r.rEa, r.rSubject
+	</select>
+	
+	
+
+</mapper>

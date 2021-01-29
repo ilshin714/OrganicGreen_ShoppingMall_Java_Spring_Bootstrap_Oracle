@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://java.sun.com/xml/ns/javaee"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		 		http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5" >
+		 		
+	<!-- 한글설정 -->
+	<filter>
+	<filter-name>encodingFilter</filter-name>
+	<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+	<init-param>
+		<param-name>encoding</param-name>
+		<param-value>UTF-8</param-value>
+	</init-param>
+	
+	
+	<init-param>
+		<param-name>forceEncoding</param-name>
+		<param-value>true</param-value>
+	</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 한글설정 END -->	 		
+	<!-- 로그인(윤지) -->
+	<servlet>
+		<servlet-name>member</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>   
+
+	<servlet-mapping>
+		<servlet-name>member</servlet-name>
+		<url-pattern>*.member</url-pattern>
+	</servlet-mapping>
+
+	<!-- 회원가입(윤지) -->
+	<servlet>
+		<servlet-name>register</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>   
+
+	<servlet-mapping>
+		<servlet-name>register</servlet-name>
+		<url-pattern>*.register</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 관리자(일신) -->
+	<servlet>
+		<servlet-name>manager</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>manager</servlet-name>
+		<url-pattern>*.manager</url-pattern>
+	</servlet-mapping>	
+	
+	<!-- 판매자(일신) -->
+	<servlet>
+		<servlet-name>seller</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>seller</servlet-name>
+		<url-pattern>*.seller</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 물품(솔빈) -->
+	<servlet>
+		<servlet-name>product</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>product</servlet-name>
+		<url-pattern>*.mulgun</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 물품(솔빈) -->
+	<servlet>
+		<servlet-name>purchase</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>purchase</servlet-name>
+		<url-pattern>*.purchase</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 마이페이지(경수) -->
+	<servlet>
+		<servlet-name>mypage</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>mypage</servlet-name>
+		<url-pattern>*.mypage</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 메인페이지(영준) -->
+	<servlet>
+		<servlet-name>market</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>market</servlet-name>
+		<url-pattern>*.market</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 고객센터(형석) -->
+	<servlet>
+		<servlet-name>service</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>service</servlet-name>
+		<url-pattern>*.service</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

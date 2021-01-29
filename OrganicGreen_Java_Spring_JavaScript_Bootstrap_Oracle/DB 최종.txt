@@ -1,0 +1,531 @@
+
+---------------------------------통합 작업------------------------------------------------------------------------------------------------------------------
+--참조키 때문에 드랍 먼저 해야함
+
+drop table question;
+drop TABLE mnotice;
+drop table FPREVIEW;
+drop table delivery;
+drop table bproduct;
+drop table cproduct;
+drop table Mproduct ;
+drop table rproduct;  
+drop table smember;
+drop table bmember;
+drop table sbMember;
+
+--아이디 검색, 로그인--
+--생성
+create table sbMember(
+sbId varchar2(200) NOT NULL CONSTRAINT sbmember_sbid_pk PRIMARY KEY, --아이디
+sbPwd varchar2(200) NOT NULL,  -- 비밀번호
+sbName varchar2(200) NOT NULL,  -- 이름
+sbemail varchar2(200) NOT NULL,  -- 이메일
+sbGrade number(20) NOT NULL,  -- 등급 ( 구매자=1 / 판매자=2 / 관리자=3)
+sbPoint number(20)  NOT NULL-- 적립금 (구매자만 있고 판매자 및 관리자는 0)
+);
+
+--입력
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('buyer','buyer123','임윤지', 'alpakapa@naver.com', 1,1000);
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('buyer2','buyer123','윤영준', 'yun@naver.com', 1,1000);
+
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('seller','seller123','지일신', 'ilsin714@naver.com', 2,0);
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('admin','admin','관리자', 'admin@admin.com', 3,0);
+
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('test1','test123','옥경수', 'okok@naver.com', 2,0);
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('test2','test123','임솔빈', 'limsol@naver.com', 2,0);
+insert into sbMember (sbId,sbPwd,sbName, sbemail, sbGrade,sbPoint) values ('test3','test123','신형석', 'ssamoney@naver.com', 2,0);
+
+--11.07 윤지 이벤트 상품검색용
+insert into sbmember (sbid,sbpwd,sbname,sbemail,sbgrade,sbpoint) values ('seller1','seller1','임은지','aler@naver.com',2,0);
+insert into sbmember (sbid,sbpwd,sbname,sbemail,sbgrade,sbpoint) values ('seller123','seller123123','신형슥','limyoonji93@naver.com',2,0);
+
+--생성
+create table bmember(
+bid varchar2(20) CONSTRAINT bmember_bid_PK PRIMARY KEY  CONSTRAINT bMember_bid_FK REFERENCES sbMember(sbId),  -- 아이디
+bphone varchar2(20) NOT NULL,  -- 핸드폰번호
+baddress varchar2(100) NOT NULL,  -- 기본주소
+baddress2 varchar2(100),  -- 상세주소
+bdate date NOT NULL,  -- 가입일자
+btpoint number(20) NOT NULL,  -- 총 포인트
+btpa number(20) NOT NULL,  -- 총 구매액
+bbdate date NOT NULL,  -- 생일
+bpostal varchar2(100) NOT NULL  -- 우편번호
+);
+
+--입력
+insert into bMember (bId,bPhone,bAddress,bAddress2,bDate,btPoint,btPa,bbDate,bPostal) 
+values ('buyer', '01055565866', '서울 동대문구 답십리로23길 30 (전농동, 동대문 롯데캐슬 노블레스)','101동 1606호',sysdate,1000,0,TO_DATE('19931001 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),02551);
+
+insert into bMember (bId,bPhone,bAddress,bAddress2,bDate,btPoint,btPa,bbDate,bPostal) 
+values ('buyer2', '01055565866', '서울 동대문구 답십리로23길 30 (전농동, 동대문 롯데캐슬 노블레스)','101동 1606호',sysdate,1000,0,TO_DATE('19931001 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),02551);
+
+
+--판매자 smember
+create table smember(
+sid varchar2(20) CONSTRAINT smember_sid_PK PRIMARY KEY  CONSTRAINT sMember_sid_FK REFERENCES sbMember(sbId),  -- 아이디
+sphone varchar2(20) NOT NULL,  -- 핸드폰번호
+saddress varchar2(100) NOT NULL,  -- 기본주소
+saddress2 varchar2(100),  -- 상세주소
+sbnumber varchar2(20) NOT NULL,  -- 사업자번호
+sfname varchar2(20) NOT NULL,  -- 상호명
+sdate date NOT NULL,  -- 가입날짜
+spostal varchar2(20) NOT NULL,  -- 우편번호
+saccount varchar2(20) NOT NULL,  -- 계좌번호  -- 유니크 제약조건 검토
+sbank varchar2(20) NOT NULL  -- 계좌 은행
+);
+
+--입력
+insert into sMember (sId,sPhone,sAddress,sAddress2,sbNumber,sfName,sDate,sPostal,sAccount,sBank) 
+values ('seller', '01047578879', '서울 강남구 언주로30길 26 (도곡동, 타워팰리스)','105동 1106호','261-81-23567','일신과수원',sysdate,06294,'058473-04-029384','국민은행');
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--제품 정보
+create table rproduct(
+rSerial number(10) ,  -- 시리얼  -- 삭제 검토 (참조키 상품명으로 해도됨)
+rOptionName varchar2(100), -- 못난이 일반 구분 
+rpName varchar2(100) CONSTRAINT rProduct_rpName_PK PRIMARY KEY,  -- 상품명 (옵션까지)
+rPrice number(10) NOT NULL,  -- 상품 단가
+rEa number(10) NOT NULL,  -- 재고량
+rsId varchar2(20) CONSTRAINT rProduct_rsId_FK REFERENCES sbMember(sbId),  --판매자 아이디(판매자 페이지 검색용) 
+rRate number(10) NOT NULL,  --할인가격 (고정값 1000원 할인 이런식)
+rPhoto varchar2(20) NOT NULL, --썸네일 그림
+rSubject varchar2(50) NOT NULL, --상품 제목 (  [특가] 황금사과 세일 ) 등
+rContent varchar2(50) NOT NULL, --스토리 그림
+rDate date NOT NULL, -- 등록 일자
+rRatePhoto varchar2(50) NOT NULL, -- 할인 상품 헤드 사진 (rRate가 있을시 -sale- 사진 입력)
+rfPrice number(10) NOT NULL,  -- 할인 적용 최종 가격 (rPrice - rRate)  -자동계산 트리거 제약조건 등 검색 후 적용
+rVideo VARCHAR2(200) -- 스토리 영상(유튜브, vimeo 등...)  --NOT NULL 검토
+);
+
+--시퀀스
+drop SEQUENCE seq_rProduct;
+create SEQUENCE seq_rProduct;
+
+-- Rproduct 데이터 입력
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval , '사과 3kg', '일반', 35000, 0, 'test1', 0, 'goldapple.png', '[일시 품절] 황금 사과 시나노 골드!', 'goldapple_content.png', sysdate, 'soldout2.jpg', 35000,'www.youtube.com/embed/MXaZC9LUda4?autoplay=0');
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval , '사과 5kg', '일반',  65000, 0, 'test1', 0, 'goldapple.png', '[일시 품절] 황금 사과 시나노 골드!', 'goldapple_content.png', sysdate, 'soldout2.jpg', 65000,'www.youtube.com/embed/MXaZC9LUda4?autoplay=0');
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval , '밤 1kg', '일반',  10000, 1000, 'test2', 0, 'chestnut.jpg', '정말로 맛있는 밤 특가', 'chestnut_content.png', sysdate, 'bsale.jpg', 9000,'player.vimeo.com/video/143611393?autoplay=1');
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval , '샤인머스켓 2kg', '일반',  36900, 3000, 'test3', 0, 'shinemuskit.jpg', '최강 특가! 샤인 머스켓!', 'shinemuskit_content.png', sysdate, 'bsale.jpg', 33900,'player.vimeo.com/video/294083538?autoplay=1');
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval , '고구마 1box', '일반',  11900, 1000, 'seller', 0, 'honeysweetpotato.png', '꿀밤 햇고구마', 'honeysweetpotato_content.png', sysdate, 'bsale.jpg', 10900,'www.youtube.com/embed/FmJQF0z--mw?autoplay=0');
+
+
+-- 윤지 11.07 이벤트 상품 용
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values(seq_rProduct.nextval,'파프리카 2kg', '세일', 14900,100,'seller123',1000,'paprica_sum.png','[예약판매]파프리카는 과학입니다.','papricaView.png',sysdate,'CommingSoon.png',13900,'player.vimeo.com/video/143570707?autoplay=1');
+insert into Rproduct(Rserial, Rpname, rOptionName, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo ) 
+values (seq_rProduct.nextval,'사과2kg', '못난이', 35000,10,'seller1',0,'gas.jpg','[못난이상품]맛있는 시나노 골드','gav.png',sysdate,'event.png',27000,'www.youtube.com/embed/MXaZC9LUda4?autoplay=0');
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--게시물 관련  -- subject / content / photo 등 rProduct랑 겹치는 부분 처리 결정해야함
+--EX) rProduct 2개품목일시 사진 등록작업 2번해야함 -> mProduct에만 등록하면 1번으로 줄이기 가능
+--rPhoto는 cProduct에서 썸네일 띄울? 쓰이므로 검토바람
+
+--입력
+create table Mproduct (
+mPhoto Varchar2(100) NOT NULL,--메인 사진
+mSubject Varchar2(100) NOT NULL, --메인 글귀
+mPrice number(20) NOT NULL, --등록된 가격
+mfPrice number(20) NOT NULL, --최종 판매가격(할인 가격)
+mrPhoto Varchar2(100), --메인 우측 상단 할인사진
+mDate date NOT NULL, --등록날짜
+mContent varchar2(100) NOT NULL,  -- 게시물 내용
+
+-- SHS 추가
+msId varchar2(20) CONSTRAINT mProduct_msId_FK REFERENCES sbMember(sbId), -- 등록한 판매자 --조인용 참조키
+
+--검토 바람 --SHS주석 필요없는거 같음 (rProduct 2개 이상일때도 참조키 가능하지만 JOIN으로는 부적합함)
+--JOIN 키는 판매자 ID가 더 안정적인듯
+mName Varchar2(100) NOT NULL, -- 판매자 상호명 
+
+--윤지 추가 이벤트 배너
+mBanner varchar2(200)
+
+
+);
+
+--메인사진, 메인글귀, 등록된가격, 최총판매가격, 메인우측상단 할인사진, 제품등록날짜, 상품이름
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('goldapple.png','[일시 품절] 황금 사과 시나노 골드!', 35000, 35000, 'soldout2.png', sysdate, '사과사과사과', 'goldapple_content.png', 'test1');
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msid) 
+values('chestnut.jpg','정말로 맛있는 밤 특가', 10000, 9000, 'bsale.png', sysdate, '밤밤밤', 'chestnut_content.png', 'test2');
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msid) 
+values('shinemuskit.jpg','최강 특가! 샤인 머스켓!', 36900, 33900, 'bsale.png', sysdate, '샤인샤인샤인', 'shinemuskit_content.png', 'test3');
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msid) 
+values('honeysweetpotato.png','꿀밤 햇고구마', 11900, 10900, 'bsale.png', sysdate, '고구마마마', 'honeysweetpotato_content.png', 'seller');
+
+-- 윤지 11.07 이벤트 상품 용
+insert into mproduct (MPHOTO,MSUBJECT,MPRICE,MFPRICE,MRPHOTO,MDATE,MCONTENT,MSID,MNAME,MBANNER) values ('paprica_sum.jpg','[예약판매]파프리카는 과학입니다.',14900,14900,'CommingSoon.png',sysdate,'papricaView.png','seller123','파프리카 2kg',1);
+insert into mproduct (MPHOTO,MSUBJECT,MPRICE,MFPRICE,MRPHOTO,MDATE,MCONTENT,MSID,MNAME,MBANNER) values ('gas.jpg','[못난이상품]맛있는 시나노 골드',35000,27000,'event.png',sysdate,'gav.png','seller1','사과',1);----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+-- Rproduct 데이터 입력
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '못난이 시나노 골드 1kg', 35000, 0, 'test1', 0, 'goldapple.png', '황금 사과 시나노 골드!', 'goldapple_content.png', sysdate, 'event.png', 30000,'www.youtube.com/embed/MXaZC9LUda4?autoplay=0', '못난이');
+
+--빨간 사과
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '소과 5kg', 20900, 10, 'test3', 0,'apple_sum.jpg','빠알간 부사', 'apple.jpg', sysdate, '0', 20900,'player.vimeo.com/video/146592261?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '중과 5kg', 25900, 10, 'test3', 0, 'apple_sum.jpg', '빠알간 부사', 'apple.jpg', sysdate, '0', 25900,'player.vimeo.com/video/146592261?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '상과 5kg', 30900, 10, 'test3', 0, 'apple_sum.jpg', '빠알간 부사', 'apple.jpg', sysdate, '0', 30900,'player.vimeo.com/video/146592261?autoplay=1', '일반');
+
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('apple_sum.jpg','빠알간 부사', 20900,  20900, '0', sysdate, '빨강 농원', 'apple.jpg', 'test3');
+
+update rproduct set RRATEPHOTO='CommingSoon.png' where Rphoto= 'apple_sum.jpg';
+update mproduct set mrphoto='CommingSoon.png' where mname='빨강 농원';
+commit;
+
+--비트 주스
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '비트사과주스 30팩', 36000, 100, 'test3', 2000, 'bitjuice_sum.jpg', '맛있는 비트주스', 'bitjuice.jpg', sysdate, 'soldout2.png', 34000,'player.vimeo.com/video/248970371?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('bitjuice_sum.jpg', '맛있는 비트주스', 36000,  34000, 'soldout2.png', sysdate, '8bit 농원', 'bitjuice.jpg', 'test3');
+
+--김(24, 50봉)
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , ' 토마토김 24봉', 15000, 100, 'test3', 0, 'gim_sum.jpg', '짭쪼롭쪼롬 토마토김', 'gim.jpg', sysdate, '0', 15000,'player.vimeo.com/video/143620473?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '토마토김 50봉', 27500, 100, 'test3', 0, 'gim_sum.jpg', '짭쪼롭쪼롬 토마토김', 'gim.jpg', sysdate, '0', 27500,'player.vimeo.com/video/143620473?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('gim_sum.jpg', '짭쪼롭쪼롬 토마토김', 15000,  15000, '0', sysdate, '김김이네 수산', 'gim.jpg', 'test3');
+
+
+--곶감
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '곶감 1kg',18000 , 100, 'test3', 0, 'gotgam_sum.jpg', '우는 애도 뚝 그치는 상주곶감', 'gotgam.jpg', sysdate, '0', 18000,'0', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '곶감 500g',10000 , 100, 'test3', 0, 'gotgam_sum.jpg', '우는 애도 뚝 그치는 상주곶감', 'gotgam.jpg', sysdate, '0', 10000,'0', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('gotgam_sum.jpg', '우는 애도 뚝 그치는 상주곶감', 10000,  10000, '0', sysdate, '상주 상회', 'gotgam.jpg', 'test3');
+commit;
+
+
+--포도주스
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '포도주스 25팩',26900 , 125, 'test3', 0, 'grape_juice_sum.png', '항산화 포도쥬스', 'grapejuice.jpg', sysdate, '0', 26900,'0', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '포도주스 50팩',53800 , 125, 'test3', 0, 'grape_juice_sum.png', '항산화 포도쥬스', 'grapejuice.jpg', sysdate, '0', 53800,'0', '일반');
+
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('grape_juice_sum.png', '항산화 포도쥬스', 26900,  26900, '0', sysdate, '달콤한 미윤상회', 'grapejuice.jpg', 'test3');
+commit;
+
+
+--키위
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '키위 보통 2kg',19000 , 180, 'test3', 2000, 'kiwi_sum.jpg', '황금빛 골드 키위', 'kiwi.jpg', sysdate, 'bsale.png', 17000,'player.vimeo.com/video/143611467?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '키위 상 2kg',22000 , 180, 'test3', 2000, 'kiwi_sum.jpg', '황금빛 골드 키위', 'kiwi.jpg', sysdate, 'bsale.png', 20000,'player.vimeo.com/video/143611467?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '키위 특 2kg',25000 , 180, 'test3', 2000, 'kiwi_sum.jpg', '황금빛 골드 키위', 'kiwi.jpg', sysdate, 'bsale.png', 23000,'player.vimeo.com/video/143611467?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('kiwi_sum.jpg', '황금빛 골드 키위', 19000,  17000, 'bsale.png', sysdate, '키위가 키우는 키위농원', 'kiwi.jpg', 'test3');
+
+--샤인머스캣
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '샤인머스캣 중품 2kg',49900 , 180, 'test3', 2000, 'muskat_sum.jpg', '찬란한 맛의 예찬, 샤인머스캣', 'muskat.png', sysdate, 'bsale.png', 47900,'player.vimeo.com/video/294083538?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '샤인머스캣 상품 2kg',54900 , 200, 'test3', 2000, 'muskat_sum.jpg', '찬란한 맛의 예찬, 샤인머스캣', 'muskat.png', sysdate, 'bsale.png', 52900,'player.vimeo.com/video/294083538?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('muskat_sum.jpg', '찬란한 맛의 예찬, 샤인머스캣', 49900,  47900, 'bsale.png', sysdate, '꿈의머스캣', 'muskat.png', 'test3');
+
+
+--옥수수
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '옥수수 1개',2000 , 300, 'test3', 0, 'oksusu_sum.jpg', '언제든 옥수수', 'oksusu.jpg', sysdate, '0', 2000,'player.vimeo.com/video/242774869?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '옥수수 10개',20000 , 300, 'test3', 0, 'oksusu_sum.jpg', '언제든 옥수수', 'oksusu.jpg', sysdate, '0', 20000,'player.vimeo.com/video/242774869?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('oksusu_sum.jpg', '언제든 옥수수', 2000,  2000, '0', sysdate, '강냉이농장', 'oksusu.jpg', 'test3');
+
+--양파
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '양파 5kg',9900 , 300, 'test3', 0, 'onion_sum.jpg', '햇살받은 양파', 'onion.jpg', sysdate, '0', 0,'player.vimeo.com/video/276171558?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '양파 10kg',14500 , 300, 'test3', 0, 'onion_sum.jpg', '햇살받은 양파', 'onion.jpg', sysdate, '0', 0,'player.vimeo.com/video/276171558?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('onion_sum.jpg', '햇살받은 양파', 9900,  9900, '0', sysdate, '파파농장', 'onion.jpg', 'test3');
+commit;
+--파프리카
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '파프리카 벌크형 2kg',16900 , 300, 'test3', 0, 'paprica_sum.jpg', '알록달록 파프리카', 'paprica.png', sysdate, '0', 0 ,'player.vimeo.com/video/143570707?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '파프리카 벌크형 3kg',23500 , 300, 'test3', 0, 'paprica_sum.jpg', '알록달록 파프리카', 'paprica.png', sysdate, '0',0,'player.vimeo.com/video/143570707?autoplay=1', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '파프리카 벌크형 5kg',35500 , 300, 'test3', 0, 'paprica_sum.jpg', '알록달록 파프리카', 'paprica.png', sysdate, '0', 0 ,'player.vimeo.com/video/143570707?autoplay=1', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('paprica_sum.jpg', '알록달록 파프리카', 16900,  16900, '0', sysdate, '예현이네파프리카', 'paprica.png', 'test3');
+commit;
+--단호박
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '단호박 100g x 10팩',25900 , 300, 'test3', 0, 'pumkin_sum.jpg', '단호한 단호박', 'pumpkin.jpg', sysdate, '0', 0 ,'0', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '단호박 100g x 20팩',46800 , 300, 'test3', 0, 'pumkin_sum.jpg', '단호한 단호박', 'pumpkin.jpg', sysdate, '0', 0 ,'0', '일반');
+
+insert into Mproduct(mPhoto, mSubject, mPrice, mfPrice, mrPhoto, mDate, mName, mcontent, msId) 
+values('pumkin_sum.jpg', '단호한 단호박', 25900,  25900, '0', sysdate, '다노단호박', 'pumpkin.jpg', 'test3');
+commit;
+--미역
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '미역 1/4올',28000 , 300, 'test3', 0, 'seaweed_sum.jpg', '칼륨왕 미역', 'seaweed.jpg', sysdate, '0', 0 ,'0', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '미역 1/2올',43000 , 300, 'test3', 0, 'seaweed_sum.jpg', '칼륨왕 미역', 'seaweed.jpg', sysdate, '0', 0 ,'0', '일반');
+
+insert into Rproduct(Rserial, Rpname, Rprice, Rea, rsid, Rrate, Rphoto, Rsubject, Rcontent, RDate, RratePhoto, rfPrice, rVideo, rOptionName ) 
+values(seq_rProduct.nextval , '미역 1올',80000 , 300, 'test3', 0, 'seaweed_sum.jpg', '칼륨왕 미역', 'seaweed.jpg', sysdate, '0', 0 ,'0', '일반');
+
+commit;
+
+
+
+
+
+
+
+-- 장바구니(cproduct)
+
+--SHS 주석 -cPrice 있어야 되는지 (rProduct랑 join해서 가격 불러와도 될듯)
+--cPhoto 검토 (상품별로 썸네일이 다름? / mcontent의 썸네일이랑 다른가? 그대로 쓸것인가)
+create table cproduct (
+   cpname varchar2(200) NOT NULL, -- CONSTRAINT cProduct_cpname_FK REFERENCES rProduct(rpName), --상품명+옵션(ex. 딸기1kg, 딸기3kg)
+   cprice varchar2(200) NOT NULL, -- 상품가격(1개당 가격)
+   cid varchar2(200) CONSTRAINT cProduct_cId_FK REFERENCES sbmember(sbid), -- 구매자 아이디
+   cEa number(20) NOT NULL, -- 상품개수
+   cPhoto varchar2(200) NOT NULL -- 상품 썸네일
+);
+
+-- cproduct 수정
+insert into CPRODUCT(cpName, cPrice, cId, cEa, cPhoto) 
+values('사과 3kg', 35000, 'buyer', 1, 'goldapple.png');
+insert into CPRODUCT(cpName, cPrice, cId, cEa, cPhoto) 
+values('사과 5kg', 65000, 'buyer', 1, 'goldapple.png');
+insert into CPRODUCT(cpName, cPrice, cId, cEa, cPhoto) 
+values('샤인머스켓 2kg', 36900, 'buyer', 1, 'shinemuskit.jpg');
+insert into CPRODUCT(cpName, cPrice, cId, cEa, cPhoto) 
+values('고구마 1box',11900, 'buyer', 1, 'honeysweetpotato.png');
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--구매기록
+
+create table Bproduct (
+   Bcode number(20) NOT NULL CONSTRAINT bProduct_bCode_PK PRIMARY KEY, -- 주문번호
+   Bpname varchar2(200) NOT NULL, --상품명+옵션(ex.딸기1kg, 딸기3kg)
+   Bpprice number(20) NOT NULL, -- 구매총액
+   Bpdate DATE NOT NULL, -- 구매일자(구매확정 클릭시 구매 일자로 반영)
+   Bpid varchar2(200) NOT NULL CONSTRAINT bProduct_bpId_FK REFERENCES sbmember(sbid), --구매자
+   Bprate number(20), -- 할인율  -- 검토
+   Bpea number(20) NOT NULL, -- 갯수
+   Bpaddress varchar2(200) NOT NULL, -- 배송될 주소
+   Bdprice number(20), -- 배송비  --삭제 검토
+   Bptotal number(20), -- 최종가격  --삭제 검토
+   Bpphoto varchar2(200), --  상품 썸네일  -- 삭제 검토 (JOIN으로 갖고 와도 됨)
+   Bsid varchar2(200) NOT NULL CONSTRAINT bProduct_bsId_FK REFERENCES sbmember(sbid), -- 판매자 아이디
+   Bpoint number(20) NOT NULL, -- 적립금
+   Bpserial number(20), -- 보류 -- 검토후 삭제 예정
+   Bprequest varchar2(200) -- 배송시 요청사항
+);
+
+--시퀀스
+drop SEQUENCE seq_bproduct;
+create SEQUENCE seq_bproduct;
+
+-- bproduct  가격 수정
+
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 11900, sysdate, 'buyer', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '사과 3kg', 35000, sysdate-20, 'buyer', 0, 1, '도봉구', 2500,  35000, 'goldapple.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '사과 5kg', 65000, sysdate-15, 'buyer', 0, 1, '도봉구', 2500,  35000, 'goldapple.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 36900, SYSDATE-90, 'buyer', 0, 1, '도봉구', 2500,  35000, 'shinemuskit2.jpg', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '밤 1kg', 10000, SYSDATE-365, 'buyer', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 30000, sysdate, 'buyer2', 0, 3, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 50000, sysdate-30, 'buyer2', 0, 5, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 10000, sysdate-60, 'buyer2', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 10000, SYSDATE-90, 'buyer2', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 20000, SYSDATE-120, 'buyer2', 0, 2, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 12000, SYSDATE-150, 'buyer2', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 2000, SYSDATE-180, 'buyer2', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현관문 앞에 놔주세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '고구마 1box', 4000, SYSDATE-210, 'buyer2', 0, 1, '도봉구', 2500,  35000, 'honeysweetpotato.png', 'seller', 200,1,'현현관문 앞에 놔주세요');
+
+
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 13000, SYSDATE-240, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 2000, SYSDATE-210, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 5000, SYSDATE-180, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 4000, SYSDATE-160, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 7000, SYSDATE-120, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 8000, SYSDATE-90, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 2300, SYSDATE-60, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 1000, SYSDATE-30, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 7000, SYSDATE, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+insert into bproduct(bcode, bpname, bpprice, bpdate, bpId, bprate,  bpea, bpaddress, bdprice, bptotal, bpphoto, bsid,  bpoint, bpserial, bprequest) 
+values (seq_bproduct.nextval, '샤인머스켓 2kg', 13000, SYSDATE, 'buyer2', 0, 1, '춘천시', 2500,  35000, 'shinemuskit.jpg', 'test3', 200,1,'먹지 마세요');
+
+---------------------------------------------------------------
+
+--배송 관련
+
+create table delivery(
+dnumber varchar2(20) NOT NULL CONSTRAINT delivery_dnumber_PK PRIMARY KEY,  --송장번호
+dcompany varchar2(20) NOT NULL,  --택배사 이름
+dstatus varchar2(20) NOT NULL,  --배송상황 (배송중, 완료 등)
+dpName varchar2(50) NOT NULL                                                                                                                                                                                                                                                                                    ,  -- 상품 이름 조인 용
+ddate date NOT NULL,  -- 배송일자(결제일자)
+dsid varchar2(20) NOT NULL CONSTRAINT delivery_dsId_FK REFERENCES sbmember(sbid)  -- 판매자 아이디
+);
+
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002001, '롯데택배', '배송준비', '고구마 1box', sysdate, 'seller');
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002002, '롯데택배', '배송준비', '고구마 1box', sysdate, 'seller');
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002003, 'CJ', '배송중', '고구마 1box', sysdate, 'seller');
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002004, 'CJ', '배송완료', '고구마 1box', sysdate, 'seller');
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002005, '로젠택배', '배송중', '고구마 1box', sysdate, 'seller');
+
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002011, 'CJ', '배송완료', '사과 3kg', sysdate, 'seller');
+insert into delivery(dnumber, dcompany, dstatus, dpName, ddate, dsid)
+values(3002012, '로젠택배', '배송중', '사과 5kg', sysdate, 'seller');
+
+
+---후기글---
+CREATE TABLE fpreview (
+rvserial NUMBER(20) NOT NULL CONSTRAINT fPreview_rvserial_PK PRIMARY KEY,   --시리얼
+rvsubject varchar2(200) NOT NULL,   --제목
+rvcontent varchar2(200) NOT NULL,  --내용
+rvlike NUMBER(20),  --좋아요 갯수
+rvphoto varchar2(200),  --사진
+rvreple VARCHAR2(200) NOT NULL,  --답글 구분용
+rvsId varchar2(20) NOT NULL CONSTRAINT fPreview_rvsId_FK REFERENCES sbmember(sbId), --조인용 Key - 판매자 아이디(작성자 아이디)
+rvid varchar2(20) NOT NULL CONSTRAINT fPreview_rvid_FK REFERENCES sbmember(sbId),  --후기 작성 아이디
+rvdate date,  --후기 작성 날짜
+rpdate date  --답글 작성 날짜
+);
+
+--시퀀스
+drop SEQUENCE seq_rvserial;
+CREATE SEQUENCE seq_rvserial;
+
+INSERT INTO FPREVIEW(RVSERIAL, RVSUBJECT, RVCONTENT, RVLIKE, RVPHOTO, RVREPLE, rvsId, rvid,rvdate,rpdate)
+ VALUES(seq_rvserial.nextval,'후기 테스트','후기 내용을 넣어봅시다',3,'honeysweetpotato.png','러러러러아러','seller','buyer',SYSDATE,SYSDATE);
+
+
+--공지사항--
+
+CREATE TABLE mNotice(
+mnSerial number(10) NOT NULL CONSTRAINT mNotice_mnSerial_PK PRIMARY KEY,  -- 공지사항 번호
+mnSubject varchar2(100) NOT NULL,  -- 제목
+mnContent varchar2(4000) NOT NULL,  -- 내용
+mnView number(10),  -- 조회수
+mnDate date NOT NULL  -- 등록일
+);
+
+drop SEQUENCE seq_mNotice;
+CREATE SEQUENCE seq_mNotice;
+
+INSERT INTO mNotice(mnSerial, mnSubject, mnContent, mnView, mnDate) 
+values(seq_mNotice.nextval, '공지사항게시판입니다.', '공지내용 넣어주세요', 32, sysdate);
+INSERT INTO mNotice(mnSerial, mnSubject, mnContent, mnView, mnDate) 
+values(seq_mNotice.nextval, '홈페이지 리뉴얼', '홈페이지가 리뉴얼됐습니다. 감사합니다.', 44, sysdate);
+INSERT INTO mNotice(mnSerial, mnSubject, mnContent, mnView, mnDate) 
+values(seq_mNotice.nextval, '못난이 상품 판매 개시', '못생겼지만 맛좋은 못난이 상품을 판매합니다.', 35, sysdate);
+INSERT INTO mNotice(mnSerial, mnSubject, mnContent, mnView, mnDate) 
+values(seq_mNotice.nextval, '겨울시즌 이벤트 시작', '겨울 시즌 농산품 이벤트 시작합니다.', 23, sysdate);
+INSERT INTO mNotice(mnSerial, mnSubject, mnContent, mnView, mnDate) 
+values(seq_mNotice.nextval, '신규가입 적립금 지원', '적립금 가입시 1000원을 드립니다.', 55, sysdate);
+
+
+--1대1 문의--
+CREATE TABLE question(
+qSerial number(10) NOT NULL CONSTRAINT question_qserial_PK PRIMARY KEY,  -- 문의 시리얼
+qbId varchar2(20) NOT NULL CONSTRAINT question_qbId_FK REFERENCES sbmember(sbId),  -- 문의 작성자 ID (구매자)
+qSubject varchar2(100) NOT NULL,  -- 문의 제목
+qContent varchar2(4000)  NULL,  -- 문의 내용
+qanswer number(10),  -- 답변 여부 ( 1 = 답변대기중 /  2 = 답변 완료  ) 
+qrSubject varchar2(100),  -- 답변 제목
+qrContent varchar2(4000),  -- 답변 내용
+qDate date NOT NULL, --문의 작성일
+qrDate date   -- 답변 작성일
+);
+
+
+--시퀀스
+drop SEQUENCE seq_question;
+CREATE SEQUENCE seq_question;
+
+INSERT INTO question(qSerial, qbId, qSubject, qContent, qAnswer, qrSubject, qrContent, qDate, qrDate) 
+values(seq_question.nextval, 'buyer', '1대1문의 드립니다!', '답변 기다리겠습니다', 1, '', '', SYSDATE, '');
+INSERT INTO question(qSerial, qbId, qSubject, qContent, qAnswer, qrSubject, qrContent, qDate, qrDate) 
+values(seq_question.nextval, 'buyer', '문의 드립니다', '테스트 문의 입니다..', 2, '답변 드립니다.', '감사합니다', SYSDATE, SYSDATE);
+
+drop function bproduct_seq_temp2;
+CREATE FUNCTION bproduct_seq_temp2 RETURN NUMBER IS
+      BEGIN
+       RETURN seq_bproduct.nextval;
+      END;
+      
+COMMIT;
+
+select * from rproduct;

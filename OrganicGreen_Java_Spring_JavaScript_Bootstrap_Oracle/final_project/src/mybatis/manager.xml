@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org/DTD Mapper 3.0 //en"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manager">
+
+
+	<!-- 관리자 일반상품 페이징 -->
+	<select id="totListSize" parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from rproduct
+		where rSerial like
+		'%${findStr}%'
+		or rsId like '%${findStr}%'
+		or rpName like '%${findStr}%'
+	</select>
+
+	<!-- 관리자 못난이 상품 페이징 -->
+	<select id="totListSizeU" parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from rproduct
+		where rpName like '%못난이%'
+	</select>
+
+	<!-- 관리자 세일 상품 페이징 -->
+	<select id="totListSizeS" parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from rproduct
+		where rRatePhoto =
+		'bsale.png'
+	</select>
+
+	<!-- 관리자 공지사항 페이징 -->
+	<select id="totListSizeN" parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from mNotice
+	</select>
+
+	<!-- 관리자 1:1문의 페이징 -->
+	<select id="totListSizeQ" parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from question
+	</select>
+
+	<!--관리자 상품조회 -->
+	<select id="search" parameterType="bean.Param"
+		resultType="bean.RproductVo">
+		select * from (
+		select rownum rn, s1.* from
+		(select rSerial,
+		rpName, rEa, rPrice, rfPrice, rsId, rRate, rPhoto, rSubject,
+		rContent,
+		rVideo, rRatePhoto , to_char(rDate, 'rrrr-MM-dd') rDate from
+		rProduct
+		where rpName like '%${findStr}%' and rsId like '%${findStr}%' and
+		rSubject
+		like '%${findStr}%' and rOptionName = '일반'
+		order by rDate desc
+		)s1
+		)where rn between ${startNo} and ${endNo}
+	</select>
+
+	<!--관리자 못난이 상품조회 -->
+	<select id="searchU" parameterType="bean.Param"
+		resultType="bean.RproductVo">
+		select * from (
+		select rownum rn, s1.* from
+		(select rSerial,
+		rpName, rEa, rPrice, rfPrice, rsId, rRate, rPhoto, rSubject,
+		rContent,
+		rVideo, rRatePhoto , to_char(rDate, 'rrrr-MM-dd') rDate from
+		rProduct
+		where rpName like '%${findStr}%' and rOptionName = '못난이'
+		order by rDate
+		desc
+		)s1
+		)where rn between ${startNo} and ${endNo}
+	</select>
+
+	<!--관리자 세일 상품조회 -->
+	<select id="searchS" parameterType="bean.Param"
+		resultType="bean.RproductVo">
+		select * from (
+		select rownum rn, s1.* from
+		(select rSerial,
+		rpName, rEa, rPrice, rfPrice, rsId, rRate, rPhoto, rSubject,
+		rContent,
+		rVideo, rRatePhoto , to_char(rDate, 'rrrr-MM-dd') rDate from
+		rProduct
+		where rRatePhoto = 'bsale.png'
+		order by rDate desc
+		)s1
+		)where rn between
+		${startNo} and ${endNo}
+	</select>
+
+	<!--관리자 공지사항 조회 -->
+	<select id="notice" parameterType="bean.Param"
+		resultType="bean.NoticeVo">
+		select * from (
+		select rownum rn, s1.* from
+		(select mnSerial,
+		mnSubject, mnContent, mnView, to_char(mnDate, 'rrrr-MM-dd')
+		mnDate from
+		mNotice
+		where mnSubject like '%${findStr}%' or mnDate like
+		'%${findStr}%' or
+		mnContent like '%${findStr}%'
+		order by mnDate desc
+		)s1
+		)where rn between ${startNo} and ${endNo}
+	</select>
+
+	<!--관리자 1:1 문의 조회 -->
+	<select id="question" parameterType="bean.Param"
+		resultType="bean.QuestionVo">
+		select * from (
+		select rownum rn, s1.* from
+		(select qSerial,
+		qbId, qSubject, qContent, qAnswer, qrSubject, qrContent,
+		to_char(qDate, 'rrrr-MM-dd') qDate, to_char(qrDate, 'rrrr-MM-dd')
+		qrDate from question
+		where qbId like '%${findStr}%' or qSubject like
+		'%${findStr}%' or qContent
+		like '%${findStr}%'
+		order by qDate desc
+		)s1
+		)where rn between ${startNo} and ${endNo}
+	</select>
+
+	<!--관리자 상품 Rproduct 입력 -->
+	<insert id="insertR" parameterType="bean.RproductVo">
+		insert into rProduct(rSerial,
+		rDate, rpName, rEa, rPrice, rfPrice, rsId, rRate, rPhoto, rSubject,
+		rContent, rVideo, rRatePhoto, rOptionName )
+		values(seq_rProduct.nextval, sysdate, #{rpName}, #{rEa}, #{rPrice},
+		#{rPrice}, #{rsId}, '0', #{rPhoto}, #{rSubject}, #{rContent},
+		#{rVideo}, '0', #{rOptionName})
+	</insert>
+
+	<!--관리자 상품 Mproduct 입력 -->
+	<insert id="insertM" parameterType="bean.MproductVo">
+		insert into
+		MProduct(mSubject, mDate, mPrice, mfPrice, mPhoto, mContent, msId,
+		mName )
+		values(#{mSubject}, sysdate, #{mPrice}, #{mPrice}, #{mPhoto},
+		#{mContent}, #{msId}, #{mName} )
+	</insert>
+
+	<!--관리자 공지사항 입력 -->
+	<insert id="insert_notice" parameterType="bean.NoticeVo">
+		insert into mNotice
+		(mnSerial, mnSubject, mnContent, mnView, mnDate )
+		values(seq_mNotice.nextval, #{mnSubject}, #{mnContent}, 0, sysdate )
+	</insert>
+
+	<!--관리자 상품 상세보기 -->
+	<select id="view" parameterType="Integer"
+		resultType="bean.RproductVo">
+		select rSerial, rDate, rpName, rEa, rPrice, rfPrice, rsId,
+		rRate, rPhoto, rSubject, rContent, rVideo from rProduct where rSerial
+		= #{serial}
+	</select>
+
+	<!--관리자 공지사항 상세보기 -->
+	<select id="notice_view" parameterType="Integer"
+		resultType="bean.NoticeVo">
+		select mnSerial, mnSubject, mnContent, mnView,
+		to_char(mnDate, 'rrrr-MM-dd') mnDate from mNotice where mnSerial =
+		#{serial}
+	</select>
+
+	<!--관리자 1:1문의 상세보기 -->
+	<select id="question_view" parameterType="Integer"
+		resultType="bean.QuestionVo">
+		select qSerial, qbId, qSubject, qContent, qAnswer,
+		qrSubject, qrContent, to_char(qDate, 'rrrr-MM-dd') qDate,
+		to_char(qrDate, 'rrrr-MM-dd') qrDate from question where qSerial =
+		#{serial}
+	</select>
+
+	<!--관리자 상품 수정 Rproduct -->
+	<update id="modify" parameterType="bean.RproductVo">
+		update rProduct set rRate =
+		#{rRate}, rRatePhoto = 'bsale.png', rfPrice = #{rfPrice} where rpName
+		= #{rpName}
+	</update>
+
+	<!--관리자 상품 수정 Mproduct -->
+	<update id="modifyM" parameterType="bean.RproductVo">
+		update mProduct set mfPrice =
+		#{rfPrice}, mrPhoto = 'bsale.png' where mSubject = #{rSubject}
+	</update>
+
+	<!--관리자 공지사항 수정 -->
+	<update id="nModify" parameterType="bean.NoticeVo">
+		update mNotice set mnSubject
+		= #{mnSubject}, mnContent = #{mnContent}, mnDate = sysdate where
+		mnSerial = #{mnSerial}
+	</update>
+
+	<!--관리자 상품삭제 시 Cproduct 삭제 -->
+	<delete id="deleteCpro" parameterType="bean.CproductVo">
+		delete from cProduct where
+		cpName = #{rpName}
+	</delete>
+
+	<!--관리자 상품 Rproduct 삭제 -->
+	<delete id="deleteRpro" parameterType="bean.RproductVo">
+		delete from rProduct where
+		rpName = #{rpName}
+	</delete>
+
+	<!--관리자 상품 Mproduct 삭제 -->
+	<delete id="deleteMpro" parameterType="bean.MproductVo">
+		delete from mProduct where
+		mName = #{rpName}
+	</delete>
+
+	<!--관리자 상품 공지사항 삭제 -->
+	<delete id="nDelete" parameterType="bean.NoticeVo">
+		delete from mNotice where
+		mnSerial = #{mnSerial}
+	</delete>
+
+	<!-- 관리자 - 배송현황 -->
+	<select id='searchDelivery' parameterType="bean.ManagerParam"
+		resultType="bean.DeliveryVo">
+		select * from(select rownum rno, A.* from (select * from
+		delivery
+		<choose>
+			<when test="!searchStatus.equals('')">where dstatus = #{searchStatus}</when>
+			<otherwise></otherwise>
+		</choose>
+		<choose>
+			<when test="searchOption.equals(2)">where dNumber like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where dpName like '%${findStr}%'</when>
+			<when test="searchOption.equals(4)">where dsId like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+		) A ) where rno between ${startNo} and
+		${endNo}
+	</select>
+
+	<!-- 관리자 - 배송현황 - 페이지 처리 -->
+	<select id='totPageDelivery' parameterType="bean.ManagerParam"
+		resultType="Integer">
+		select count(*) cnt
+		from
+		delivery
+		<choose>
+			<when test="!searchStatus.equals('')">where dstatus = #{searchStatus}</when>
+			<otherwise></otherwise>
+		</choose>
+		<choose>
+			<when test="searchOption.equals(2)">where dNumber like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where dpName like '%${findStr}%'</when>
+			<when test="searchOption.equals(4)">where dsId like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
+	<!-- 배송 차트 -->
+	<!-- 배송전 건수 카드 작성용 -->
+	<select id='searchDeliveryChart1'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송준비'
+	</select>
+
+	<!-- 배송중 건수 카드 작성용 -->
+	<select id='searchDeliveryChart2'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송중'
+	</select>
+
+	<!-- 배송완료 건수 카드 작성용 -->
+	<select id='searchDeliveryChart3'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '배송완료'
+	</select>
+
+	<!-- 입급대기 건수 카드 작성용 -->
+	<select id='searchDeliveryChart4'
+		parameterType="bean.ManagerParam" resultType="Integer">
+		select count(*) cnt from
+		delivery where dstatus = '입급대기'
+	</select>
+
+	<select id='searchSell' parameterType="bean.ManagerParam"
+		resultType="bean.SellerVo">
+		select * from(select rownum rno, A.* from (select * from
+		bproduct
+		<choose>
+			<when test="searchOption.equals(2)">where bpName like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where bpId like '%${findStr}%'</when>
+			<when test="searchOption.equals(4)">where bsId like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+		) A
+		) where rno between ${startNo} and
+		${endNo}
+	</select>
+
+	<select id='totPageSell' parameterType="bean.ManagerParam"
+		resultType="Integer">
+		select count(*) cnt from
+		bproduct
+		<choose>
+			<when test="searchOption.equals(2)">where bpName like '%${findStr}%'</when>
+			<when test="searchOption.equals(3)">where bpId like '%${findStr}%'</when>
+			<when test="searchOption.equals(4)">where bsId like '%${findStr}%'</when>
+			<otherwise></otherwise>
+		</choose>
+	</select>
+
+	<!-- 판매현황 카드 작성용 - 총판매액, 총판매량 -->
+	<select id='searchSellChartAll' resultType="bean.SellerVo">
+		select sum(bpprice)
+		totPrice, sum(bpea) totEa from bproduct
+	</select>
+
+	<!-- 관리자 메인 곡선차트 -->
+	<select id="chartMain" parameterType="Integer"
+		resultType="bean.BproductVo">
+		select sum(bpprice) monthTotal from bProduct where
+		to_char(bpDate , 'yyyy-fmMM') like '2019-${i}'
+	</select>
+
+	<!-- 관리자 메인 파이차트 -->
+	<select id="chartPie" resultType="bean.BproductVo">
+		select sum(bpTotal)
+		mainPieTotal, bpName from bProduct group by(bpName)
+	</select>
+
+	<!-- 관리자 메인 월누계 -->
+	<select id="chartMonthTotal" resultType="bean.BproductVo">
+		select sum(bpTotal)
+		monthTotal from bProduct where to_char(bpDate,
+		'yyyy-MM') =
+		to_char(sysdate , 'yyyy-MM')
+	</select>
+
+	<!-- 관리자 메인 연누계 -->
+	<select id="chartYearTotal" resultType="bean.BproductVo">
+		select sum(bpea)
+		yearTotalEa, sum(bpTotal) yearTotal from bProduct where
+		to_char(bpDate, 'yyyy') = to_char(sysdate, 'yyyy')
+	</select>
+
+	<!-- 관리자 매출판매현황 -->
+	<select id="chartSale" resultType="bean.BproductVo">
+		select
+		sum(b.bpea) totSaleEa,
+		r.rEa, r.rSubject from bProduct b join rProduct
+		r on b.bpName =
+		r.rpName group by r.rEa, r.rSubject
+	</select>
+
+	<!-- SHS수정 11.08 -->
+	<!-- 1대1 문의 답면 및 수정 -->
+	<update id="qModify" parameterType="bean.QuestionVo">
+		update question set qanswer =
+		2, qrsubject = #{qrSubject}, qrcontent = #{qrContent}, qrDate =
+		#{qrDate} where qSerial = ${qSerial}
+	</update>
+
+	<!-- SHS 11.07 추가 -->
+	<!-- 판매현황 상세보기 -->
+	<select id='sellView' parameterType="Integer"
+		resultType="bean.SellerVo">
+		select * from bproduct where bcode = ${bCode}
+	</select>
+
+	<!-- 배송현황 상세보기 -->
+	<select id='deliveryView' parameterType="Integer"
+		resultType="bean.DeliveryVo">
+		select * from delivery where dNumber = ${dNumber}
+	</select>
+
+
+
+
+
+	<!-- 구매자 목록 보기 -->
+	<select id='bmemberSearch' parameterType="bean.Param"
+		resultType="bean.SbMemberVo">
+		select * from(select rownum rno, A.* from (select sb.sbId,
+		sb.sbName, sb.sbEmail, b.bPhone, to_char(b.bDate, 'rrrr-mm-dd') bDate
+		from
+		sbmember sb join bmember b
+		on sb.sbId = b.bId
+		where sb.sbGrade = 1
+		)
+		A ) where rno between
+		${startNo} and
+		${endNo}
+	</select>
+
+	<!-- 구매자 목록 보기 - 페이지 처리 -->
+	<select id='totPageBmember' parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from sbMember sb join bmember b
+		on
+		sb.sbId = b.bId where sb.sbGrade = 1
+	</select>
+
+	<!-- 판매자 목록 보기 -->
+	<select id='smemberSearch' parameterType="bean.Param"
+		resultType="bean.SbMemberVo">
+		select * from(select rownum rno, A.* from (select sb.sbId,
+		sb.sbName, sb.sbEmail, s.sfName, s.sbNumber, to_char(s.sDate, 'rrrr-mm-dd') sDate
+		from
+		sbmember sb join smember s
+		on sb.sbId = s.sId
+		where sb.sbGrade = 2
+		)
+		A ) where rno between
+		${startNo} and
+		${endNo}
+	</select>
+
+	<!-- 판매자 리스트 뽑기 - 페이지 처리 -->
+	<select id='totPageSmember' parameterType="bean.Param"
+		resultType="Integer">
+		select count(*) cnt from sbMember sb join smember s
+		on
+		sb.sbId = s.sId where sb.sbGrade = 2
+	</select>
+
+
+</mapper>

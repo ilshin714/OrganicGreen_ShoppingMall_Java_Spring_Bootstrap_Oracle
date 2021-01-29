@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org/DTD Mapper 3.0//en"
+      "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mulgun">
+
+	<select id="totListSize" parameterType="bean.BproductParam" resultType="Integer">
+		select count(*) cnt from fpreview
+	</select>
+
+	<select id='view' parameterType='bean.MproductVo' resultType='bean.MproductVo'>
+ 		select *
+ 		from mproduct where mSubject = #{rSubject }
+ 	</select>
+ 	
+ 	<select id='option' parameterType='bean.RproductVo' resultType='bean.RproductVo'>
+ 		select rpName, rPrice, rContent, rVideo
+ 		from rproduct where rSubject = #{rSubject }
+ 	</select>
+ 	
+ 	<select id='review' parameterType='Integer' resultType='bean.FpReviewVo'>
+ 		select * from (
+		select rownum rno, A.* from
+		(select *
+		from fpreview 
+		order by rvdate desc) A
+		)where rno between
+		${startNo} and ${endNo}
+ 	</select>
+</mapper>

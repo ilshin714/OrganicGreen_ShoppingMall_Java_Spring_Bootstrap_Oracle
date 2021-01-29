@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org/DTD Mapper 3.0 //en"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="main">
+<!-- 못난이 상품 -->
+	<select id="ugly" resultType="bean.MproductVo">
+		select *
+		from mProduct m join rProduct r
+		on m.msubject = r.rsubject
+		where m.mrPhoto='event.png' and r.ROPTIONNAME= '못난이' order by mDate desc
+
+	</select>
+
+	<!-- comming soon 상품 검색 -->
+	<select id="commingSoon" resultType="bean.MproductVo">
+		select * from mProduct where
+		mrPhoto='CommingSoon.png' order by mDate desc
+	</select>
+
+	<!-- 세일마크 붙은 상품(세일상품) 찾기 -->
+	<select id="sale" resultType="bean.MproductVo">
+		select * from mProduct where
+		mrPhoto='bsale.png' order by mDate desc
+	</select>
+
+	<select id="search" resultType="bean.MproductVo">
+		select * from mproduct order by
+		mdate desc
+
+	</select>
+
+</mapper>   
